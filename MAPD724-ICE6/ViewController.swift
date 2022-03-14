@@ -20,13 +20,7 @@ class ViewController: UIViewController , UIImagePickerControllerDelegate,
     @objc var movieURL: URL?
     @objc var lastChosenMediaType: String?
     
-    lazy var imagePicker: UIImagePickerController =
-    {
-        let picker: UIImagePickerController = UIImagePickerController()
-        picker.sourceType = .photoLibrary
-        picker.delegate = self
-        return picker
-    }()
+
     
     
     @IBOutlet var imageView: UIImageView!
@@ -41,8 +35,8 @@ class ViewController: UIViewController , UIImagePickerControllerDelegate,
     
     @IBAction func selectExistingPictureOrVideo(_ sender: UIButton)
     {
-//        pickMediaFromSource(.photoLibrary)
-        self.present(self.imagePicker, animated: true,  completion: nil)
+        pickMediaFromSource(.photoLibrary)
+//        self.present(self.imagePicker, animated: true,  completion: nil)
         
     }
     
@@ -65,7 +59,6 @@ class ViewController: UIViewController , UIImagePickerControllerDelegate,
     @objc func updateDisplay()
     {
         print("display:~~~~");
-        print("lastChosenMediaType: \(lastChosenMediaType)");
         
         if let mediaType = lastChosenMediaType {
             
@@ -143,40 +136,31 @@ class ViewController: UIViewController , UIImagePickerControllerDelegate,
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any])
     {
+        
+        lastChosenMediaType = info[UIImagePickerController.InfoKey.mediaType] as? String
+        
+
+        print("ipController:lastChosenMediaType = \(lastChosenMediaType)");
+        
+        if let mediaType = lastChosenMediaType {
+            print("ipController:mediaType = \(mediaType)");
+            print("UTType: \(UTType.image)")
+
+            if mediaType == (kUTTypeImage as NSString) as String {
             
-        if let originalImage: UIImage = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
-            self.imageView.image = originalImage
+                self.imageView.image = info[UIImagePickerController.InfoKey.editedImage] as? UIImage
+            
+            
+            } else if mediaType == (kUTTypeMovie as NSString) as String {
+                movieURL = info[UIImagePickerController.InfoKey.mediaURL] as? URL
+            }
         }
-        
+
+
         self.dismiss(animated: true, completion: nil)
-        
+
     }
     
-//    private func imagePickerController(_ picker: UIImagePickerController,
-//                        didFinishPickingMediaWithInfo info: [String : AnyObject])
-//    {
-//        lastChosenMediaType = info[UIImagePickerController.InfoKey.mediaType.rawValue] as? String
-//
-//
-//        print("ipController:lastChosenMediaType = \(lastChosenMediaType)");
-//
-//
-//
-//
-//        if let mediaType = lastChosenMediaType {
-//
-//
-//            print("ipController:mediaType = \(mediaType)");
-//
-//
-//            if mediaType == (kUTTypeImage as NSString) as String {
-//                image = info[UIImagePickerController.InfoKey.editedImage.rawValue] as? UIImage
-//            } else if mediaType == (kUTTypeMovie as NSString) as String {
-//                movieURL = info[UIImagePickerController.InfoKey.mediaURL.rawValue] as? URL
-//            }
-//        }
-//        picker.dismiss(animated: true, completion: nil)
-//    }
 
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController)
     {
